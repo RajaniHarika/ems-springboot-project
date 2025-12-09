@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Employee Dashboard</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(120deg, #1e3c72, #2a5298);
+            margin: 0;
+            padding: 20px;
+            color: white;
+        }
+
+        .box {
+            background: white;
+            color: black;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        input, button {
+            padding: 8px;
+            margin: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background: #1e3c72;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Employee Management System</h2>
+
+<div class="box">
+    <h3>Add Employee</h3>
+    <input id="name" placeholder="Name">
+    <input id="email" placeholder="Email">
+    <input id="dept" placeholder="Department">
+    <button onclick="add()">Add</button>
+</div>
+
+<div class="box">
+    <h3>Search</h3>
+    <input id="search" placeholder="Search by name">
+    <button onclick="search()">Search</button>
+</div>
+
+<div class="box">
+    <h3>Employee List</h3>
+    <table>
+        <thead>
+        <tr><th>ID</th><th>Name</th><th>Email</th><th>Dept</th><th>Delete</th></tr>
+        </thead>
+        <tbody id="data"></tbody>
+    </table>
+</div>
+
+<script>
+    function load() {
+        fetch("/api/employees")
+            .then(r => r.json())
+            .then(data => {
+                let tbody = "";
+                data.forEach(e => {
+                    tbody += `
+                        <tr>
+                            <td>${e.id}</td>
+                            <td>${e.name}</td>
+                            <td>${e.email}</td>
+                            <td>${e.department}</td>
+                            <td><button onclick="del(${e.id})">Delete</button></td>
+                        </tr>`;
+                });
+                document.getElementById("data").innerHTML = tbody;
+            });
+    }
+
+    function add() {
+        fetch(`/api/employees/add?name=${name.value}&email=${email.value}&department=${dept.value}`,
+            { method: "POST" }
+        ).then(() => {
+            load();
+        });
+    }
+
+    function del(id) {
+        fetch(`/api/employees/${id}`, { method: "DELETE" })
+            .then(() => load());
+    }
+
+    function search() {
+        fetch(`/api/employees/search?q=${search.value}`)
+            .then(r => r.json())
+            .then(data => {
+                let tbody = "";
+                data.forEach(e => {
+                    tbody += `
+                        <tr>
+                            <td>${e.id}</td>
+                            <td>${e.name}</td>
+                            <td>${e.email}</td>
+                            <td>${e.department}</td>
+                            <td><button onclick="del(${e.id})">Delete</button></td>
+                        </tr>`;
+                });
+                document.getElementById("data").innerHTML = tbody;
+            });
+    }
+
+    load();
+</script>
+
+</body>
+</html>
