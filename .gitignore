@@ -32,3 +32,4 @@ build/
 ### VS Code ###
 .vscode/
 emsdb.mv.db
+emsdb.trace.db 
